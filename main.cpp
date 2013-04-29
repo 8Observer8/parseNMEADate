@@ -1,0 +1,65 @@
+/* 
+ * File:   main.cpp
+ * Author: Ivan
+ *
+ * Created on April 26, 2013, 9:25 AM
+ */
+
+#include <cstddef>
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct split {
+
+    enum empties_t {
+        empties_ok, no_empties
+    };
+};
+
+template <typename Container>
+Container& split(
+        Container& result,
+        const typename Container::value_type& s,
+        const typename Container::value_type& delimiters,
+        split::empties_t empties = split::empties_ok) {
+    result.clear();
+    size_t current;
+    size_t next = -1;
+    do {
+        if (empties == split::no_empties) {
+            next = s.find_first_not_of(delimiters, next + 1);
+            if (next == string::npos) break;
+            next -= 1;
+        }
+        current = next + 1;
+        next = s.find_first_of(delimiters, current);
+        result.push_back(s.substr(current, next - current));
+    } while (next != string::npos);
+    return result;
+}
+
+void print(vector <string> & v) {
+    for (size_t n = 0; n < v.size(); n++)
+        cout << "\"" << v[ n ] << "\"\n";
+    cout << endl;
+}
+
+int main() {
+    string s = "One, two,, four , five,";
+
+    vector <string> fields;
+
+    cout << "\"" << s << "\"\n\n";
+
+    split(fields, s, ",");
+    print(fields);
+    cout << fields.size() << " fields.\n\n";
+
+    split(fields, s, ",", split::no_empties);
+    print(fields);
+    cout << fields.size() << " fields.\n";
+
+    return 0;
+}
